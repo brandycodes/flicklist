@@ -48,11 +48,13 @@ function discoverMovies(callback) {
 function searchMovies(searchTerm, callback) {
   console.log("searching for movies with '" + searchTerm + "' in their title...");
 
-  // TODO 9
-  // implement this function as described in the comment above
-  // you can use the body of discoverMovies as a jumping off point
-
-
+  $.ajax({
+    url: ${api.root}/search/movie?api_key=${api.token}&query=${searchTerm}
+    success: function(response) {
+      model.browseItems = response.results;
+      callback();
+    }
+  });
 }
 
 
@@ -70,8 +72,7 @@ function render() {
     var title = $("<p></p>").text(movie.original_title);
     var itemView = $("<li></li>")
       .append(title)
-      // TODO 3
-      // give itemView a class attribute of "item-watchlist"
+      .attr('class','item-watchlist')
 
     $("#section-watchlist ul").append(itemView);
   });
@@ -79,28 +80,26 @@ function render() {
   // insert browse items
   model.browseItems.forEach(function(movie) {
     var title = $("<h4></h4>").text(movie.original_title);
+    var overview = $("<p></p>").text(movie.overview)
     var button = $("<button></button>")
       .text("Add to Watchlist")
       .click(function() {
         model.watchlistItems.push(movie);
         render();
       });
+     .prop('disabled', model.watchlistItems.includes(movie));
+
       // TODO 2
       // the button should be disabled if this movie is already in
       // the user's watchlist
       // see jQuery .prop() and Array.indexOf()
 
 
-    // TODO 1
-    // create a paragraph containing the movie object's .overview value
-    // then, in the code block below,
-    // append the paragraph in between the title and the button
-
-
     // append everything to itemView, along with an <hr/>
     var itemView = $("<li></li>")
       .append($("<hr/>"))
       .append(title)
+      .append(overview)
       .append(button);
 
     // append the itemView to the list
